@@ -1,12 +1,11 @@
 from pxr import UsdGeom
 import omni.usd as usd
+from omni.kit.window.file_exporter import get_file_exporter
 
 from .commons import log_info
 
 
 def get_selected_mesh_prims():
-    
-    
     ctx = usd.get_context()
     current_stage = ctx.get_stage()
     selection = ctx.get_selection().get_selected_prim_paths()
@@ -49,9 +48,16 @@ def convert_face_varying_to_vertex_interpolation(usd_file_path):
 
 def is_mesh_editable(mesh):
     """
-    Returns false if the Mesh's defining USD file isn't located in the mods folder, thus, ignoring "captures/" ones.
+    Returns False if the Mesh's defining USD file isn't located in the mods folder, thus, ignoring "captures/" ones.
     """
     return 'gameReadyAssets' in mesh.GetPrimStack()[-1].layer.realPath
+
+
+def is_a_captured_mesh(mesh):
+    """
+    Returns True if the Mesh's defining USD file is located in the captures folder.
+    """
+    return 'captures' in mesh.GetPrimStack()[-1].layer.realPath
 
 
 
