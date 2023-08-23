@@ -1,34 +1,58 @@
+import asyncio
 import os
 from typing import List
 
 from pxr import UsdGeom
 from omni.kit.window.file_exporter import get_file_exporter
-from pxr import Usd
+from omni.client import make_relative_url
+import omni
+from pxr import Usd, Sdf
 import omni.usd as usd
 
 from .commons import log_info
 from . import mesh_utils
 
 
-
 def open_export_dialog_for_mesh(prim_path, mesh):
+    async def setup_replacement_references_in_stage(current_stage, reference_file_location):
+        _, mesh_hash, __ = Usd.Prim.GetName(mesh.GetParent()).split('_')
+        xform_prim_path = f'/RootNode/meshes/mesh_{mesh_hash}/Xform_{mesh_hash}_0'
+        omni.kit.commands.execute('CreatePrim', prim_type='Xform', prim_path=xform_prim_path)
+        editing_layer = current_stage.GetEditTarget().GetLayer()
+        relative_file_path = make_relative_url(editing_layer.realPath, reference_file_location)
+        omni.kit.commands.execute('AddReference',
+            stage=current_stage,
+            prim_path=Sdf.Path(xform_prim_path),
+            reference=Sdf.Reference(relative_file_path)
+        )
+        selection = omni.usd.get_context().get_selection()
+        selection.clear_selected_prim_paths()
+        selection.set_selected_prim_paths([xform_prim_path], False)
+
     def file_export_handler(filename: str, dirname: str, extension: str = "", selections: List[str] = []):
         stage = Usd.Stage.CreateInMemory()
-        UsdGeom.Xform.Define(stage, '/root')
+        root_xform = UsdGeom.Xform.Define(stage, '/root').GetPrim()
+        stage.SetDefaultPrim(root_xform)
         new_mesh = UsdGeom.Mesh.Define(stage, f'/root/{prim_path.rsplit("/", 1)[-1]}')
 
-        for attr in mesh.GetAttributes():
-            destAttr = new_mesh.GetPrim().CreateAttribute(attr.GetName(), attr.GetTypeName())
-            if attr.Get():
-                destAttr.Set(attr.Get())
+        needed_attr_names = ['doubleSided', 'extent', 'faceVertexCounts', 'faceVertexIndices', 'normals', 'points', 'primvars:st']
+        [
+            new_mesh.GetPrim().CreateAttribute(attr.GetName(), attr.GetTypeName()).Set(attr.Get())
+            for attr in mesh.GetAttributes()
+            if attr.Get() and attr.GetName() in needed_attr_names
+        ]
+        mesh_utils.convert_mesh_to_vertex_interpolation_mode(new_mesh)
         
         ctx = usd.get_context()
         current_stage = ctx.get_stage()
         upAxis = UsdGeom.GetStageUpAxis(current_stage)
         UsdGeom.SetStageUpAxis(stage, upAxis)
 
-        stage.Export(dirname + filename + extension)
-        log_info(f"> Exporting {prim_path} in '{dirname}{filename}{extension}'")
+        save_location = dirname + filename + extension
+        stage.Export(save_location)
+        asyncio.ensure_future(setup_replacement_references_in_stage(current_stage, save_location))
+        
+        log_info(f"> Exporting {prim_path} in '{save_location}'")
 
     source_layer = mesh.GetPrimStack()[-1].layer
     rtx_remix_path_parts = source_layer.realPath.split(os.path.join("rtx-remix"), 1)

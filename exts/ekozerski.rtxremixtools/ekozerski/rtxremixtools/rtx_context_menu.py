@@ -8,6 +8,7 @@ from . import setup_for_mesh_replacements
 def _build_fix_mesh_geometry_menu_item():
     tooltip = ''.join([
         'Interpolation Mode\n',
+        'OBS: Operation Can\'t be undone\n',
         '    RTX Remix runtime only supports "vertex" interpolation mode, in which "points", "normals" and "uvs" arrays ',
         'must have the same length, but DCC tools usually export the mesh using "faceVarying" interpolation mode.',
         'This operation reorganizes the geometry to be compatible with the runtime. See:\n',
