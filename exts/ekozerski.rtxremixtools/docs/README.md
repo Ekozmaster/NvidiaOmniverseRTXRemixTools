@@ -12,7 +12,7 @@ It is primarily designed to operate on Remix captured scenes, so users can have 
 ## Available Tools
 #### Fix Meshes Geometry
 <i>(Operation is performed in the mesh source file and can\'t be undone)</i>
-- Interpolation Mode 
+- Interpolation Mode
   - RTX Remix runtime only supports meshes with "vertex" interpolation mode, in which "points" "normals" and "uvs" arrays 
 must have the same length, but DCC tools usually export the mesh using "faceVarying" interpolation mode.
 This operation reorganizes the geometry to be compatible with the runtime.
@@ -26,3 +26,11 @@ This operation reorganizes the geometry to be compatible with the runtime.
   - Use the "Fix Meshes Geometry" again to make it Remix-compatible.
   - Enjoy.
 - The original mesh is kept in case the user only wants to add more models. Make sure to delete it if the intention is to completely replace the original mesh.
+
+#### Add Model
+- If the user already has authored USD models, this option allows to select multiple models and add to the mesh_HASH prim.
+
+
+## Things to Keep in mind
+- In a capture scene, any changes made to the "inst_SOMEHASH_x" prims won't show up in the runtime, so every changes must be done in the "mesh_SOMEHASH" they're referencing. Whenever the user clicks a inst_ prim to perform an action like Fixing geometry or Add Model (Ex: Right clicking in the 3D viewport), this tool will try to find the referenced mesh_SOMEHASH and perform the operations in it instead.
+- The only material types that work in the runtime are described in the AperturePBR_Opacity.MDL and AperturePBR_Translucent.MDL, and every mesh must be triangulated. If you want to add a model you got from somewhere else like an asset store, make sure to convert the assets to work in the runtime.
