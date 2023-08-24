@@ -62,7 +62,7 @@ def convert_face_varying_to_vertex_interpolation(usd_file_path):
     stage.Export(usd_file_path)
 
 
-def is_mesh_editable(mesh):
+def is_a_modded_mesh(mesh):
     """
     Returns False if the Mesh's defining USD file isn't located in the mods folder, thus, ignoring "captures/" ones.
     """
@@ -78,7 +78,7 @@ def is_a_captured_mesh(mesh):
 
 
 def fix_meshes_geometry():
-    meshes = {k: v for k,v in get_selected_mesh_prims().items() if is_mesh_editable(v)}
+    meshes = {k: v for k,v in get_selected_mesh_prims().items() if is_a_modded_mesh(v)}
     for path, mesh in meshes.items():
         source_layer = mesh.GetPrimStack()[-1].layer
         convert_face_varying_to_vertex_interpolation(source_layer.realPath)
