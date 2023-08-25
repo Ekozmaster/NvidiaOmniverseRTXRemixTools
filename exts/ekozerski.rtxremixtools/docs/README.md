@@ -4,8 +4,6 @@ Focusing on improving RTX Remix modding workflows, this extension is designed to
 
 It provides some options for the "Right click" context menu to setup ideal replacement assets, as well as some converting operations to ensure assets will be compatible with the Remix runtime.
 
-![Alt text](ContextMenu.png)
-
 It is primarily designed to operate on Remix captured scenes, so users can have instant feedbacks on what their mods are gonna look like in the game scenes and iterate faster.
 
 
