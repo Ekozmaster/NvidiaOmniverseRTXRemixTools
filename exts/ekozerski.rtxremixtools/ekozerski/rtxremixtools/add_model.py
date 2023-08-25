@@ -1,16 +1,16 @@
 import os
 from typing import List
 
-from pxr import UsdGeom
-from omni.kit.window.file_exporter import get_file_exporter
-from omni.kit.window.file_importer import get_file_importer
-from omni.client import make_relative_url
 import omni
-from pxr import Usd, Sdf
+from omni.client import make_relative_url
+from omni.kit.window.file_importer import get_file_importer
+from omni.kit.window.file_exporter import get_file_exporter
 import omni.usd as usd
+from pxr import UsdGeom, Usd, Sdf
 
-from .commons import log_info
-from . import mesh_utils
+from ekozerski.rtxremixtools.utils import find_source_mesh_hash_prim
+from ekozerski.rtxremixtools.commons import log_info
+from ekozerski.rtxremixtools import mesh_utils
 
 
 def open_export_dialog_for_captured_mesh(prim_path, mesh):
@@ -100,7 +100,7 @@ def copy_original_mesh(prim_path, mesh, output_path):
 
 
 def setup_references_in_stage(mesh, current_stage, reference_file_location):
-    find_source_mesh_prim(current_stage, mesh)
+    find_source_mesh_hash_prim(current_stage, mesh)
     _, mesh_hash, __ = Usd.Prim.GetName(mesh.GetParent()).split('_')
     xform_prim_path = f'/RootNode/meshes/mesh_{mesh_hash}/Xform_{mesh_hash}_0'
     omni.kit.commands.execute('CreatePrim', prim_type='Xform', prim_path=xform_prim_path)
@@ -146,23 +146,6 @@ def open_export_dialog_for_captured_mesh(prim_path, mesh):
     )
 
 
-def find_source_mesh_prim(current_stage, instance_mesh):
-    search_prim = instance_mesh
-    valid_paths = ['/RootNode/meshes', '/RootNode/instances']
-    while search_prim.GetParent().IsValid() and search_prim.GetParent().GetPath().pathString not in valid_paths:
-        search_prim = search_prim.GetParent()
-    
-    if not search_prim:
-        return None
-    
-    if 'mesh_' in Usd.Prim.GetName(search_prim):
-        return search_prim
-
-    _, mesh_hash, __ = Usd.Prim.GetName(search_prim).split('_')
-    mesh_prim_path = f'/RootNode/meshes/mesh_{mesh_hash}'
-    return current_stage.GetPrimAtPath(mesh_prim_path)
-
-
 def open_import_dialog_for_add_models(prim_path, instance_mesh):
     def import_mesh(filename: str, dirname: str, selections: List[str] = []):
         # TODO: Loop through all selections and add them all to the mesh_HASH with their respective xforms correctly named without collisions.
@@ -195,7 +178,7 @@ def open_import_dialog_for_add_models(prim_path, instance_mesh):
 
     ctx = usd.get_context()
     current_stage = ctx.get_stage()
-    mesh = find_source_mesh_prim(current_stage, instance_mesh)
+    mesh = find_source_mesh_hash_prim(current_stage, instance_mesh)
 
     source_layer = mesh.GetPrimStack()[-1].layer
     rtx_remix_path_parts = source_layer.realPath.split(os.path.join("rtx-remix"), 1)

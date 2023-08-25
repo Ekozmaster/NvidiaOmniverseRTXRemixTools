@@ -3,6 +3,7 @@ import omni.ui as ui
 
 from . import mesh_utils
 from . import add_model
+from . import preserve_draw_calls
 
 
 def _build_fix_mesh_geometry_menu_item():
@@ -53,9 +54,38 @@ def _build_add_model_menu_item():
     )
 
 
+def _build_preserve_original_draw_call_menu_item():
+    tooltip = ''.join([
+        "Add a 'custom int preserveOriginalDrawCall' attribute set to '1' to the mesh_HASH prim. Used to indicate to",
+        " the runtime whether it should keep rendering the original mesh or not. Should be set when adding custom ",
+        " lights without removing the original mesh from rendering."
+    ])
+    ui.MenuItem(
+        "Preserve",
+        triggered_fn=lambda: preserve_draw_calls.set_preserve_original_draw_call(True),
+        tooltip=tooltip
+    )
+
+
+def _build_dont_preserve_original_draw_call_menu_item():
+    tooltip = ''.join([
+        "Add a 'custom int preserveOriginalDrawCall' attribute set to '0' to the mesh_HASH prim. Used to indicate to",
+        " the runtime whether it should keep rendering the original mesh or not. Should be set when adding custom ",
+        " lights without removing the original mesh from rendering."
+    ])
+    ui.MenuItem(
+        "Don't Preserve",
+        triggered_fn=lambda: preserve_draw_calls.set_preserve_original_draw_call(False),
+        tooltip=tooltip
+    )
+
+
 def build_rtx_remix_menu(event):
     icon = get_custom_glyph_code("${glyphs}/menu_create.svg")
     with ui.Menu(f' {icon}  RTX Remix'):
         _build_fix_mesh_geometry_menu_item()
         _build_setup_for_mesh_replacements_menu_item()
         _build_add_model_menu_item()
+        with ui.Menu(f'Original Draw Call Preservation'):
+            _build_preserve_original_draw_call_menu_item()
+            _build_dont_preserve_original_draw_call_menu_item()
