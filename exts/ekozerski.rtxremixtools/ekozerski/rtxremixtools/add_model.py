@@ -66,12 +66,10 @@ def open_export_dialog_for_captured_mesh(prim_path, mesh):
     
     rtx_remix_path = os.path.join(rtx_remix_path, "CustomMesh")
     
-    # Get the singleton extension object, but as weakref to guard against the extension being removed.
     file_exporter = get_file_exporter()
     file_exporter.show_window(
         title=f'Export "{prim_path}"',
         export_button_label="Save",
-        # The callback function called after the user has selected an export location.
         export_handler=file_export_handler,
         filename_url=rtx_remix_path,
     )
@@ -135,12 +133,10 @@ def open_export_dialog_for_captured_mesh(prim_path, mesh):
     
     rtx_remix_path = os.path.join(rtx_remix_path, "CustomMesh")
     
-    # Get the singleton extension object, but as weakref to guard against the extension being removed.
     file_exporter = get_file_exporter()
     file_exporter.show_window(
         title=f'Export "{prim_path}"',
         export_button_label="Save",
-        # The callback function called after the user has selected an export location.
         export_handler=export_mesh,
         filename_url=rtx_remix_path,
     )
@@ -188,12 +184,10 @@ def open_import_dialog_for_add_models(prim_path, instance_mesh):
     
     rtx_remix_path = os.path.join(rtx_remix_path, "CustomMesh")
     
-    # Get the singleton extension object, but as weakref to guard against the extension being removed.
     file_importer = get_file_importer()
     file_importer.show_window(
         title=f'Import Models',
         import_button_label="Import",
-        # The callback function called after the user has selected an export location.
         import_handler=import_mesh,
         filename_url=rtx_remix_path,
     )

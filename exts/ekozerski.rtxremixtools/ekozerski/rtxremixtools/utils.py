@@ -1,4 +1,5 @@
 from pxr import Usd
+from omni import usd
 
 
 def find_source_mesh_hash_prim(current_stage, instance_mesh):
