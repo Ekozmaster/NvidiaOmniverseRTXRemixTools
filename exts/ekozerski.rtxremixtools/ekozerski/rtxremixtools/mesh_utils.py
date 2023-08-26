@@ -105,7 +105,7 @@ def convert_face_varying_to_vertex_interpolation(usd_file_path):
         convert_uv_primvars_to_st(UsdGeom.Mesh(prim))
         remove_unused_primvars(UsdGeom.Mesh(prim))
 
-    stage.Export(usd_file_path)
+    stage.Save()
 
 
 def is_a_modded_mesh(mesh):
