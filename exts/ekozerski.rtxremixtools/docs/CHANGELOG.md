@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## [Unreleased] - xxxx-xx-xx
+- Added convertion of many "primvar:*" name variations for UV-related primvars to "primvars:st" while discarding extra UV maps
+- Removing unused primvars "displayColor" and "displayOpacity".
+
+
 ## [0.0.1] - 2023-08-25
 - Initial version
 - Added "Fix Meshes Geometry" option converting interpolation mode to "vertex".

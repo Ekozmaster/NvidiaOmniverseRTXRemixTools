@@ -9,7 +9,7 @@ It is primarily designed to operate on Remix captured scenes, so users can have 
 
 ## Available Tools
 ### Fix Meshes Geometry
-<i>(Operation is performed in the mesh source file and can\'t be undone)</i>
+<i>(Operation is performed on every mesh of a USD/USDA source file and can\'t be undone)</i>
 
 Interpolation Mode
 - RTX Remix runtime only supports meshes with "vertex" interpolation mode, in which "points" "normals" and "uvs" arrays 
@@ -17,6 +17,12 @@ must have the same length, but DCC tools usually export the mesh using "faceVary
 This operation reorganizes the geometry to be compatible with the runtime.
 - See: "Interpolation of Geometric Primitive Variables" - https://openusd.org/dev/api/class_usd_geom_primvar.html
 - This operation only applies for meshes inside the mods folder, not the captured ones.
+
+UV Maps
+- The runtime supports one single UV map per mesh, which should have one of a few known names, so this script finds many variations, picks one and renames to the standard "primvars:st", while also setting the appropriate type as "TextureCoordinate" (TexCoord2fArray / TexCoord2f[]). The other UVmaps are discarded.
+
+Unused Primvars
+- displayColor and displayOpacity are now removed from the mesh.
 
 ### Setup for Mesh Replacement
 Exports the selected mesh in a selected path, already setting up the replacements and references to work in the runtime, so for every change the user only needs to:

@@ -1,4 +1,5 @@
-from pxr import UsdGeom, Usd
+from collections import OrderedDict
+from pxr import UsdGeom, Usd, Sdf
 import omni.usd as usd
 
 
@@ -53,11 +54,56 @@ def convert_mesh_to_vertex_interpolation_mode(mesh):
     mesh.SetNormalsInterpolation(UsdGeom.Tokens.vertex)
 
 
+def convert_uv_primvars_to_st(mesh):
+    # https://github.com/NVIDIAGameWorks/dxvk-remix/blob/ebb0ecfd638d6a32ab5f10708b5b07bc763cf79b/src/dxvk/rtx_render/rtx_mod_usd.cpp#L696
+    # https://github.com/Kim2091/RTXRemixTools/blob/8ae25224ef8d1d284f3e208f671b2ce6a35b82af/RemixMeshConvert/For%20USD%20Composer/RemixMeshConvert_OV.py#L4
+    known_uv_names = [
+        'primvars:st',
+        'primvars:uv',
+        'primvars:st0',
+        'primvars:st1',
+        'primvars:st2',
+        'primvars:UVMap',
+        'primvars:UVChannel_1',
+        'primvars:map1',
+    ]
+    # Preserving the order of found primvars to use the first one, in case a primvars:st can't be found.
+    uv_primvars = OrderedDict(
+        (primvar.GetName(), primvar)
+        for primvar in mesh.GetPrimvars()
+        if primvar.GetTypeName().role == 'TextureCoordinate'
+        or primvar.GetName() in known_uv_names
+    )
+    if not uv_primvars:
+        return
+    
+    # Picking only one UV and blowing up everything else as the runtime only reads the first anyway.
+    considered_uv = uv_primvars.get('primvars:st') or next(iter(uv_primvars.values()))
+    uv_data = considered_uv.Get()
+    primvar_api = UsdGeom.PrimvarsAPI(mesh)
+    [primvar_api.RemovePrimvar(uv_name) for uv_name in uv_primvars.keys()]
+
+    # Recreating the primvar with appropriate name, type and role
+    new_uv_primvar = primvar_api.CreatePrimvar('primvars:st', Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.vertex)
+    new_uv_primvar.Set(uv_data)
+
+
+def remove_unused_primvars(mesh):
+    unused_primvar_names = [
+        'primvars:displayColor',
+        'primvars:displayOpacity',
+    ]
+    primvar_api = UsdGeom.PrimvarsAPI(mesh)
+    [primvar_api.RemovePrimvar(uv_name) for uv_name in unused_primvar_names]
+
+
 def convert_face_varying_to_vertex_interpolation(usd_file_path):
     stage = Usd.Stage.Open(usd_file_path)
     mesh_prims = [prim for prim in stage.TraverseAll() if UsdGeom.Mesh(prim)]
     for prim in mesh_prims:
         convert_mesh_to_vertex_interpolation_mode(UsdGeom.Mesh(prim))
+        convert_uv_primvars_to_st(UsdGeom.Mesh(prim))
+        remove_unused_primvars(UsdGeom.Mesh(prim))
 
     stage.Export(usd_file_path)
 
