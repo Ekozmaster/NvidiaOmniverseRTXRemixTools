@@ -2,6 +2,8 @@ from collections import OrderedDict
 from pxr import UsdGeom, Usd, Sdf
 import omni.usd as usd
 
+from ekozerski.rtxremixtools.commons import log_error
+
 
 def get_selected_mesh_prims():
     ctx = usd.get_context()
@@ -97,10 +99,14 @@ def remove_unused_primvars(mesh):
     [primvar_api.RemovePrimvar(uv_name) for uv_name in unused_primvar_names]
 
 
-def convert_face_varying_to_vertex_interpolation(usd_file_path):
+def fix_meshes_in_file(usd_file_path):
     stage = Usd.Stage.Open(usd_file_path)
     mesh_prims = [prim for prim in stage.TraverseAll() if UsdGeom.Mesh(prim)]
     for prim in mesh_prims:
+        faceVertices = prim.GetAttribute("faceVertexCounts").Get()
+        if not faceVertices or not all({x == 3 for x in faceVertices}):
+            log_error(f"Mesh {prim.GetPath()} in '{usd_file_path}' hasn't been triangulated and this tools doesn't do that for you yet :(")
+            continue
         convert_mesh_to_vertex_interpolation_mode(UsdGeom.Mesh(prim))
         convert_uv_primvars_to_st(UsdGeom.Mesh(prim))
         remove_unused_primvars(UsdGeom.Mesh(prim))
@@ -127,5 +133,5 @@ def fix_meshes_geometry():
     meshes = {k: v for k,v in get_selected_mesh_prims().items() if is_a_modded_mesh(v)}
     for path, mesh in meshes.items():
         source_layer = mesh.GetPrimStack()[-1].layer
-        convert_face_varying_to_vertex_interpolation(source_layer.realPath)
+        fix_meshes_in_file(source_layer.realPath)
         source_layer.Reload()
