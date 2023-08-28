@@ -70,9 +70,10 @@ def convert_uv_primvars_to_st(mesh):
         'primvars:map1',
     ]
     # Preserving the order of found primvars to use the first one, in case a primvars:st can't be found.
+    primvar_api = UsdGeom.PrimvarsAPI(mesh)
     uv_primvars = OrderedDict(
         (primvar.GetName(), primvar)
-        for primvar in mesh.GetPrimvars()
+        for primvar in primvar_api.GetPrimvars()
         if primvar.GetTypeName().role == 'TextureCoordinate'
         or primvar.GetName() in known_uv_names
     )
@@ -82,7 +83,6 @@ def convert_uv_primvars_to_st(mesh):
     # Picking only one UV and blowing up everything else as the runtime only reads the first anyway.
     considered_uv = uv_primvars.get('primvars:st') or next(iter(uv_primvars.values()))
     uv_data = considered_uv.Get()
-    primvar_api = UsdGeom.PrimvarsAPI(mesh)
     [primvar_api.RemovePrimvar(uv_name) for uv_name in uv_primvars.keys()]
 
     # Recreating the primvar with appropriate name, type and role
