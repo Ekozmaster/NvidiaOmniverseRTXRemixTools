@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added convertion of many "primvar:*" name variations for UV-related primvars to "primvars:st" while discarding extra UV maps
 - Removing unused primvars "displayColor" and "displayOpacity".
 
+## [0.0.2] - 2023-08-28
+- Fixing relative paths converted to absolute on the "Fix Meshes Geometry" function.
+- Picking best UV map available between all primvars and discarding everything else in the "Fix Meshes Geometry"
+- Removing unused primvars when using the "Fix Meshes Geometry".
+- Few more bugfixes.
 
 ## [0.0.1] - 2023-08-25
 - Initial version
