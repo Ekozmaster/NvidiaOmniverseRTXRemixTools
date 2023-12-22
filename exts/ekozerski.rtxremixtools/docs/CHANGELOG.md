@@ -2,10 +2,14 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-
-## [Unreleased] - xxxx-xx-xx
-- Added convertion of many "primvar:*" name variations for UV-related primvars to "primvars:st" while discarding extra UV maps
+## [0.0.3] - 2023-12-22
+- "Add Model", "Add Material" and "Fix Mesh Geometry" also works when not in a capture scene now.
+- Fixed somes errors when using "Fix Mesh Geometry" option in some meshes.
+- Added "Shift + F" hotkey to "Select Source Mesh".
+- Fixed error when using "Setup for Mesh Replacement" on captures which nests original game meshes inside a "ref" Xform.
+- Added convertion of many "primvar:*" name variations for UV-related primvars to "primvars:st" while discarding extra UV maps.
 - Removing unused primvars "displayColor" and "displayOpacity".
+- Xforms from added models and materials now are named according to the imported file rather than Xform_HASH_x
 
 ## [0.0.2] - 2023-08-28
 - Fixing relative paths converted to absolute on the "Fix Meshes Geometry" function.

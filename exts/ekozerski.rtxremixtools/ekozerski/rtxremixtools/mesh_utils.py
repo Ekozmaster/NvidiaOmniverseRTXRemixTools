@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import os
 from pxr import UsdGeom, Usd, Sdf
 import omni.usd as usd
 
@@ -36,6 +37,7 @@ def convert_mesh_to_vertex_interpolation_mode(mesh):
     face_varying_primvars = [v for v in primvars if v.GetInterpolation() == UsdGeom.Tokens.faceVarying]
     if face_varying_primvars or mesh.GetNormalsInterpolation() == UsdGeom.Tokens.faceVarying:
         non_face_varying_primvars = list(primvars.difference(face_varying_primvars))
+        non_face_varying_primvars = [var for var in non_face_varying_primvars if var.GetInterpolation() != 'uniform']
         indices = prim.GetAttribute("faceVertexIndices")
 
         # Settings points separately since it doesn't have a "SetInterpolation" like primvars.
@@ -114,23 +116,16 @@ def fix_meshes_in_file(usd_file_path):
     stage.Save()
 
 
-def is_a_modded_mesh(mesh):
-    """
-    Returns False if the Mesh's defining USD file isn't located in the mods folder, thus, ignoring "captures/" ones.
-    """
-    return 'gameReadyAssets' in mesh.GetPrimStack()[-1].layer.realPath
-
-
 def is_a_captured_mesh(mesh):
     """
     Returns True if the Mesh's defining USD file is located in the captures folder.
     """
-    return 'captures' in mesh.GetPrimStack()[-1].layer.realPath
+    return os.path.normpath("captures/meshes") in os.path.normpath(mesh.GetPrimStack()[-1].layer.realPath)
 
 
 
 def fix_meshes_geometry():
-    meshes = {k: v for k,v in get_selected_mesh_prims().items() if is_a_modded_mesh(v)}
+    meshes = {k: v for k,v in get_selected_mesh_prims().items() if not is_a_captured_mesh(v)}
     for path, mesh in meshes.items():
         source_layer = mesh.GetPrimStack()[-1].layer
         fix_meshes_in_file(source_layer.realPath)

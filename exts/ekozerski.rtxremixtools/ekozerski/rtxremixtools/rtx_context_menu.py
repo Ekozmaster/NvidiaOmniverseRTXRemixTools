@@ -23,7 +23,7 @@ def _build_fix_mesh_geometry_menu_item():
         "Fix Meshes Geometry",
         triggered_fn=mesh_utils.fix_meshes_geometry,
         enabled=any([
-            mesh_utils.is_a_modded_mesh(mesh)
+            not mesh_utils.is_a_captured_mesh(mesh)
             for mesh in mesh_utils.get_selected_mesh_prims().values()
         ]),
         tooltip=tooltip
@@ -103,7 +103,7 @@ def _build_select_source_meshes_menu():
         "Selects the corresponding mesh_HASH the prim is related to."
     ])
     ui.MenuItem(
-        "Select Source Mesh",
+        "Select Source Mesh (Shift + F)",
         triggered_fn=select_source_mesh.select_source_meshes,
         tooltip=tooltip,
         enabled=bool(usd.get_context().get_selection().get_selected_prim_paths())
