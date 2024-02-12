@@ -9,7 +9,7 @@ from omni.kit.window.file_exporter import get_file_exporter
 import omni.usd as usd
 from pxr import UsdGeom, Usd, Sdf
 
-from ekozerski.rtxremixtools.utils import find_inst_hash_prim
+from ekozerski.rtxremixtools.utils import find_inst_hash_prim, find_source_mesh_hash_prim
 from ekozerski.rtxremixtools.commons import log_info
 from ekozerski.rtxremixtools import mesh_utils
 
@@ -182,7 +182,8 @@ def open_import_dialog_for_add_models(prim_path):
 
     ctx = usd.get_context()
     current_stage = ctx.get_stage()
-    mesh = current_stage.GetPrimAtPath(prim_path)  # find_source_mesh_hash_prim(current_stage, instance_mesh)
+    inst_prim = current_stage.GetPrimAtPath(prim_path)
+    mesh = find_source_mesh_hash_prim(current_stage, inst_prim)
 
     source_layer = mesh.GetPrimStack()[-1].layer
     filename_url = UserCache.LAST_OPENED_MODEL if UserCache.LAST_OPENED_MODEL is not None else source_layer.realPath
