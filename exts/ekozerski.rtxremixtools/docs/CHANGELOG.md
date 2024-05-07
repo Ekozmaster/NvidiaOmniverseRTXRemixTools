@@ -2,6 +2,9 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.4] - UNRELEASED
+- Added tool to multi-select and import captures, merging repeated instances by transform matrix (position, rotation, scale...).
+
 ## [0.0.3] - 2023-12-22
 - "Add Model", "Add Material" and "Fix Mesh Geometry" also works when not in a capture scene now.
 - Fixed somes errors when using "Fix Mesh Geometry" option in some meshes.

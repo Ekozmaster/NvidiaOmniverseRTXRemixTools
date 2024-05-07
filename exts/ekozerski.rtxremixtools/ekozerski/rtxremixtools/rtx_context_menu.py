@@ -7,6 +7,7 @@ from . import add_model
 from . import add_material
 from . import preserve_draw_calls
 from . import select_source_mesh
+from . import import_captures
 
 
 def _build_fix_mesh_geometry_menu_item():
@@ -110,6 +111,17 @@ def _build_select_source_meshes_menu():
     )
 
 
+def _build_import_captures_menu():
+    tooltip = ''.join([
+        "Imports captures making a best effort to properly merge the contents of repeating instances."
+    ])
+    ui.MenuItem(
+        "Import Captures",
+        triggered_fn=import_captures.import_captures,
+        tooltip=tooltip
+    )
+
+
 def build_rtx_remix_menu(event):
     icon = get_custom_glyph_code("${glyphs}/menu_create.svg")
     with ui.Menu(f' {icon}  RTX Remix'):
@@ -121,3 +133,4 @@ def build_rtx_remix_menu(event):
             _build_preserve_original_draw_call_menu_item()
             _build_dont_preserve_original_draw_call_menu_item()
         _build_select_source_meshes_menu()
+        _build_import_captures_menu()
