@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.0.4] - UNRELEASED
+## [0.0.4] - 2024-05-08
 - Added tool to multi-select and import captures, merging repeated instances by transform matrix (position, rotation, scale...).
 
 ## [0.0.3] - 2023-12-22

@@ -1,13 +1,9 @@
 from collections import defaultdict
 from typing import List
 
-from pxr import Usd, Sdf, UsdGeom, Gf
+from pxr import Usd, Sdf, UsdGeom
 from omni.usd import get_context
 from omni.kit.window.file_importer import get_file_importer
-from omni.kit import commands
-from omni.client import make_relative_url
-
-from ekozerski.rtxremixtools.commons import log_info
 
 
 def copy_instances(source_stage: Usd.Stage, dest_stage: Usd.Stage):
@@ -34,10 +30,10 @@ def copy_instances(source_stage: Usd.Stage, dest_stage: Usd.Stage):
     for (hash_key, _), prim_data in instances_map.items():
         hash_groups[hash_key].append(prim_data)
     
-    temp_stage = Usd.Stage.CreateInMemory()
-    temp_stage.DefinePrim("/RootNode")
-    temp_stage.DefinePrim("/RootNode/instances")
-    temp_inst_merge_layer = temp_stage.GetRootLayer()
+    temp_inst_merge_layer = Sdf.Layer.CreateAnonymous()
+    Sdf.PrimSpec(temp_inst_merge_layer, 'RootNode', Sdf.SpecifierDef)
+    Sdf.PrimSpec(temp_inst_merge_layer.GetPrimAtPath('RootNode'), 'instances', Sdf.SpecifierDef)
+
     for hash, prims_data in hash_groups.items():
         inst_count = 0
         for prim, prim_layer in prims_data:
@@ -52,7 +48,7 @@ def copy_instances(source_stage: Usd.Stage, dest_stage: Usd.Stage):
 
 def import_capture_usd(capture_path):
     def copy_child_prims_specs(parent_path: str):
-        # Performin one Sdf.CopySpec on parents like RootNode/meshes won't merge prims
+        # Performing one Sdf.CopySpec on parents like RootNode/meshes won't merge prims
         # Instead, will remove destination mesh_HASH and add source's prims on top. So we copy one by one ;)
         for prim in capture_stage.GetPrimAtPath(parent_path).GetAllChildren():
             Sdf.CopySpec(capture_layer, prim.GetPath(), current_layer, prim.GetPath())
@@ -68,22 +64,24 @@ def import_capture_usd(capture_path):
     # This is needed or else Sdf.CopySpec gets iffy on non-capture scenes.
     current_stage.DefinePrim("/RootNode")
     current_stage.DefinePrim("/RootNode/meshes")
-    copy_child_prims_specs('/RootNode/meshes')
     current_stage.DefinePrim("/RootNode/lights")
-    copy_child_prims_specs('/RootNode/lights')
     current_stage.DefinePrim("/RootNode/Looks")
-    copy_child_prims_specs('/RootNode/Looks')
     if capture_stage.GetPrimAtPath('/RootNode/cameras'):
         current_stage.DefinePrim("/RootNode/cameras")
-        copy_child_prims_specs('/RootNode/cameras')
-    copy_instances(capture_stage, current_stage)
+    
+    with Sdf.ChangeBlock():
+        copy_child_prims_specs('/RootNode/meshes')
+        copy_child_prims_specs('/RootNode/lights')
+        copy_child_prims_specs('/RootNode/Looks')
+        if capture_stage.GetPrimAtPath('/RootNode/cameras'):
+            copy_child_prims_specs('/RootNode/cameras')
+        copy_instances(capture_stage, current_stage)
 
 def import_captures():
     def import_selected_captures(filename: str, dirname: str, selections: List[str] = []):
         for capture_usd in selections:
             import_capture_usd(capture_usd)
     
-    filename_url = get_context().get_stage().GetRootLayer().realPath
     file_importer = get_file_importer()
     file_importer.show_window(
         title=f'Import Models',
