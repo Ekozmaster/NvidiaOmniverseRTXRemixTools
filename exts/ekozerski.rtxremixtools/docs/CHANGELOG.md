@@ -2,6 +2,9 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.5] - 2024-07-20
+- Adding support for Omniverse's Paint Tool scatter brush, to hand paint assets on mesh surfaces and being Remix-compatible.
+
 ## [0.0.4] - 2024-05-08
 - Added tool to multi-select and import captures, merging repeated instances by transform matrix (position, rotation, scale...).
 
