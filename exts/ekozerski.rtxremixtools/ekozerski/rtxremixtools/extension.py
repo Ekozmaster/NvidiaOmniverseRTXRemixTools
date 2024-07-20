@@ -3,9 +3,12 @@ import omni.ui as ui
 from omni.kit import context_menu
 from omni.kit.hotkeys.core import get_hotkey_registry
 from omni.kit.actions.core import get_action_registry
+from omni.paint.system.core import register_brush, unregister_brush
+from omni.paint.brush.scatter.brush import get_ext_path
 
 from . import commons
 from .rtx_context_menu import build_rtx_remix_menu
+from .brush import RemixScatterBrush
 
 
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
@@ -28,6 +31,8 @@ class RtxRemixTools(omni.ext.IExt):
             "select_source_mesh",
             filter=None,
         )
+
+        register_brush(RemixScatterBrush.get_type(), __package__, RemixScatterBrush.__name__)
         
 
     def on_shutdown(self):
@@ -38,6 +43,7 @@ class RtxRemixTools(omni.ext.IExt):
             self.select_source_mesh_hotkey,
         )
         deregister_actions(self.ext_id)
+        unregister_brush(RemixScatterBrush.get_type(), __package__, RemixScatterBrush.__name__)
 
 
 def register_actions(extension_id):
