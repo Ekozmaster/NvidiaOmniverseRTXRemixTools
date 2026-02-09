@@ -8,7 +8,8 @@ from omni.kit.window.file_importer import get_file_importer
 
 def copy_instances(source_stage: Usd.Stage, dest_stage: Usd.Stage):
     def parse_instance_hash(inst):
-        return inst.GetName().split('_')[1]
+        parts = inst.GetName().split('_')
+        return parts[1] if len(parts) >= 2 else inst.GetName()
 
     def get_instance_transform(inst):
         xform = UsdGeom.Xformable(inst)

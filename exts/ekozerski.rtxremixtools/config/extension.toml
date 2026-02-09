@@ -4,7 +4,7 @@ reloadable = true
 
 [package]
 # Semantic Versioning is used: https://semver.org/
-version = "0.0.5"
+version = "0.0.6"
 
 # Lists people or organizations that are considered the "authors" of the package.
 authors = ["Emanuel Kozerski"]
@@ -37,9 +37,17 @@ preview_image = "data/preview.png"
 icon = "data/icon.png"
 
 
-# Use omni.ui to build simple UI
 [dependencies]
-"omni.kit.uiapp" = {}
+"omni.kit.context_menu" = {}
+"omni.kit.hotkeys.core" = {}
+"omni.kit.actions.core" = {}
+"omni.kit.commands" = {}
+"omni.kit.window.file_importer" = {}
+"omni.kit.window.file_exporter" = {}
+"omni.client" = {}
+"omni.paint.system.core" = {}
+"omni.paint.brush.scatter" = {}
+"omni.ui" = {}
 
 
 # Main python module this extension provides, it will be publicly available as "import ekozerski.rtxremixtools".

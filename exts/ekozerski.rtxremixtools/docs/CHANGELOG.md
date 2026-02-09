@@ -1,6 +1,8 @@
 # Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+## [0.0.6] - 2024-07-20
+- Adding "Anchor Prim Path" brush option to customize which mesh_HASH will be the parent of the painted mesh instances.
 
 ## [0.0.5] - 2024-07-20
 - Adding support for Omniverse's Paint Tool scatter brush, to hand paint assets on mesh surfaces and being Remix-compatible.

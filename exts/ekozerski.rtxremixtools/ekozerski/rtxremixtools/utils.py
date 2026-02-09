@@ -14,12 +14,18 @@ def find_source_mesh_hash_prim(current_stage, prim):
     if not search_prim:
         return None
     
-    if 'mesh_' in Usd.Prim.GetName(search_prim):
+    prim_name = Usd.Prim.GetName(search_prim)
+    if 'mesh_' in prim_name:
         return search_prim
 
-    _, mesh_hash, __ = Usd.Prim.GetName(search_prim).split('_')
-    mesh_prim_path = f'/RootNode/meshes/mesh_{mesh_hash}'
-    return current_stage.GetPrimAtPath(mesh_prim_path)
+    # Expected format: inst_HASH_N or similar with at least 2 underscores
+    parts = prim_name.split('_')
+    if len(parts) >= 2:
+        mesh_hash = parts[1]
+        mesh_prim_path = f'/RootNode/meshes/mesh_{mesh_hash}'
+        return current_stage.GetPrimAtPath(mesh_prim_path)
+    
+    return None
     
 
 def find_inst_hash_prim(instance_mesh):
